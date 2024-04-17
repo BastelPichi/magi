@@ -29,8 +29,6 @@
 #define printf OutputDebugStringF
 
 using namespace std;
-using namespace boost;
-using namespace boost::asio;
 using namespace json_spirit;
 
 void ThreadRPCServer2(void* parg);
@@ -527,8 +525,8 @@ bool ClientAllowed(const boost::asio::ip::address& address)
 
 	std::string ipv4addr = address.to_string();
 
-    if (address == asio::ip::address_v4::loopback()
-     || address == asio::ip::address_v6::loopback()
+    if (address == boost::asio::ip::address_v4::loopback()
+     || address == boost::asio::ip::address_v6::loopback()
      || (address.is_v4()
          // Check whether IPv4 addresses match 127.0.0.0/8 (loopback subnet)
       && (address.to_v4().to_ulong() & 0xff000000) == 0x7f000000))
@@ -546,15 +544,15 @@ bool ClientAllowed(const boost::asio::ip::address& address)
 // IOStream device that speaks SSL but can also speak non-SSL
 //
 template <typename Protocol>
-class SSLIOStreamDevice : public iostreams::device<iostreams::bidirectional> {
+class SSLIOStreamDevice : public boost::iostreams::device<boost::iostreams::bidirectional> {
 public:
-    SSLIOStreamDevice(asio::ssl::stream<typename Protocol::socket> &streamIn, bool fUseSSLIn) : stream(streamIn)
+    SSLIOStreamDevice(boost::asio::ssl::stream<typename Protocol::socket> &streamIn, bool fUseSSLIn) : stream(streamIn)
     {
         fUseSSL = fUseSSLIn;
         fNeedHandshake = fUseSSLIn;
     }
 
-    void handshake(ssl::stream_base::handshake_type role)
+    void handshake(boost::asio::ssl::stream_base::handshake_type role)
     {
         if (!fNeedHandshake) return;
         fNeedHandshake = false;
@@ -562,27 +560,27 @@ public:
     }
     std::streamsize read(char* s, std::streamsize n)
     {
-        handshake(ssl::stream_base::server); // HTTPS servers read first
-        if (fUseSSL) return stream.read_some(asio::buffer(s, n));
-        return stream.next_layer().read_some(asio::buffer(s, n));
+        handshake(boost::asio::ssl::stream_base::server); // HTTPS servers read first
+        if (fUseSSL) return stream.read_some(boost::asio::buffer(s, n));
+        return stream.next_layer().read_some(boost::asio::buffer(s, n));
     }
     std::streamsize write(const char* s, std::streamsize n)
     {
-        handshake(ssl::stream_base::client); // HTTPS clients write first
-        if (fUseSSL) return asio::write(stream, asio::buffer(s, n));
-        return asio::write(stream.next_layer(), asio::buffer(s, n));
+        handshake(boost::asio::ssl::stream_base::client); // HTTPS clients write first
+        if (fUseSSL) return boost::asio::write(stream, boost::asio::buffer(s, n));
+        return boost::asio::write(stream.next_layer(), boost::asio::buffer(s, n));
     }
     bool connect(const std::string& server, const std::string& port)
     {
 #if BOOST_VERSION >= 106600
-        ip::tcp::resolver resolver(GetIOService(stream));
+        boost::asio::ip::tcp::resolver resolver(GetIOService(stream));
 #else
-        ip::tcp::resolver resolver(stream.get_io_service());
+        boost::asio::ip::tcp::resolver resolver(stream.get_io_service());
 #endif
-        ip::tcp::resolver::query query(server.c_str(), port.c_str());
-        ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-        ip::tcp::resolver::iterator end;
-        boost::system::error_code error = asio::error::host_not_found;
+        boost::asio::ip::tcp::resolver::query query(server.c_str(), port.c_str());
+        boost::asio::ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+        boost::asio::ip::tcp::resolver::iterator end;
+        boost::system::error_code error = boost::asio::error::host_not_found;
         while (error && endpoint_iterator != end)
         {
             stream.lowest_layer().close();
@@ -596,7 +594,7 @@ public:
 private:
     bool fNeedHandshake;
     bool fUseSSL;
-    asio::ssl::stream<typename Protocol::socket>& stream;
+    boost::asio::ssl::stream<typename Protocol::socket>& stream;
 };
 
 class AcceptedConnection
@@ -614,8 +612,8 @@ class AcceptedConnectionImpl : public AcceptedConnection
 {
 public:
     AcceptedConnectionImpl(
-            asio::io_service& io_service,
-            ssl::context &context,
+            boost::asio::io_service& io_service,
+            boost::asio::ssl::context &context,
             bool fUseSSL) :
         sslStream(io_service, context),
         _d(sslStream, fUseSSL),
@@ -639,11 +637,11 @@ public:
     }
 
     typename Protocol::endpoint peer;
-    asio::ssl::stream<typename Protocol::socket> sslStream;
+    boost::asio::ssl::stream<typename Protocol::socket> sslStream;
 
 private:
     SSLIOStreamDevice<Protocol> _d;
-    iostreams::stream< SSLIOStreamDevice<Protocol> > _stream;
+    boost::iostreams::stream< SSLIOStreamDevice<Protocol> > _stream;
 };
 
 void ThreadRPCServer(void* parg)
@@ -670,15 +668,15 @@ void ThreadRPCServer(void* parg)
 // Forward declaration required for RPCListen
 #if BOOST_VERSION >= 106600 && BOOST_VERSION < 107000
 template <typename Protocol>
-static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol> > acceptor,
+static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol> > acceptor,
                              ssl::context& context,
                              bool fUseSSL,
                              AcceptedConnection* conn,
                              const boost::system::error_code& error);
 #else
 template <typename Protocol, typename SocketAcceptorService>
-static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
-                             ssl::context& context,
+static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
+                             boost::asio::ssl::context& context,
                              bool fUseSSL,
                              AcceptedConnection* conn,
                              const boost::system::error_code& error);
@@ -689,13 +687,13 @@ static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol, 
  */
 #if BOOST_VERSION >= 106600 && BOOST_VERSION < 107000
 template <typename Protocol>
-static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol> > acceptor,
-                   ssl::context& context,
+static void RPCListen(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol> > acceptor,
+                   boost::asio::ssl::context& context,
                    const bool fUseSSL)
 #else
 template <typename Protocol, typename SocketAcceptorService>
-static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
-                   ssl::context& context,
+static void RPCListen(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
+                   boost::asio::ssl::context& context,
                    const bool fUseSSL)
 #endif
 {
@@ -726,15 +724,15 @@ static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol, SocketA
  */
 #if BOOST_VERSION >= 106600 && BOOST_VERSION < 107000
 template <typename Protocol>
-static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol> > acceptor,
-                             ssl::context& context,
+static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol> > acceptor,
+                             boost::asio::ssl::context& context,
                              const bool fUseSSL,
                              AcceptedConnection* conn,
                              const boost::system::error_code& error)
 #else
 template <typename Protocol, typename SocketAcceptorService>
-static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
-                             ssl::context& context,
+static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
+                             boost::asio::ssl::context& context,
                              const bool fUseSSL,
                              AcceptedConnection* conn,
                              const boost::system::error_code& error)
@@ -743,11 +741,11 @@ static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol, 
     vnThreadsRunning[THREAD_RPCLISTENER]++;
 
     // Immediately start accepting new connections, except when we're cancelled or our socket is closed.
-    if (error != asio::error::operation_aborted
+    if (error != boost::asio::error::operation_aborted
      && acceptor->is_open())
         RPCListen(acceptor, context, fUseSSL);
 
-    AcceptedConnectionImpl<ip::tcp>* tcp_conn = dynamic_cast< AcceptedConnectionImpl<ip::tcp>* >(conn);
+    AcceptedConnectionImpl<boost::asio::ip::tcp>* tcp_conn = dynamic_cast< AcceptedConnectionImpl<boost::asio::ip::tcp>* >(conn);
 
     // TODO: Actually handle errors
     if (error)
@@ -807,25 +805,25 @@ void ThreadRPCServer2(void* parg)
 
     const bool fUseSSL = GetBoolArg("-rpcssl");
 
-    asio::io_service io_service;
+    boost::asio::io_service io_service;
 
 #if BOOST_VERSION >= 106600
-    ssl::context context(ssl::context::sslv23);
+    boost::asio::ssl::context context(boost::asio::ssl::context::sslv23);
 #else
-    ssl::context context(io_service, ssl::context::sslv23);
+    boost::asio::ssl::context context(io_service, boost::asio::ssl::context::sslv23);
 #endif
     if (fUseSSL)
     {
-        context.set_options(ssl::context::no_sslv2);
+        context.set_options(boost::asio::ssl::context::no_sslv2);
 
-        filesystem::path pathCertFile(GetArg("-rpcsslcertificatechainfile", "server.cert"));
-        if (!pathCertFile.is_complete()) pathCertFile = filesystem::path(GetDataDir()) / pathCertFile;
-        if (filesystem::exists(pathCertFile)) context.use_certificate_chain_file(pathCertFile.string());
+        boost::filesystem::path pathCertFile(GetArg("-rpcsslcertificatechainfile", "server.cert"));
+        if (!pathCertFile.is_complete()) pathCertFile = boost::filesystem::path(GetDataDir()) / pathCertFile;
+        if (boost::filesystem::exists(pathCertFile)) context.use_certificate_chain_file(pathCertFile.string());
         else printf("ThreadRPCServer ERROR: missing server certificate file %s\n", pathCertFile.string().c_str());
 
-        filesystem::path pathPKFile(GetArg("-rpcsslprivatekeyfile", "server.pem"));
-        if (!pathPKFile.is_complete()) pathPKFile = filesystem::path(GetDataDir()) / pathPKFile;
-        if (filesystem::exists(pathPKFile)) context.use_private_key_file(pathPKFile.string(), ssl::context::pem);
+        boost::filesystem::path pathPKFile(GetArg("-rpcsslprivatekeyfile", "server.pem"));
+        if (!pathPKFile.is_complete()) pathPKFile = boost::filesystem::path(GetDataDir()) / pathPKFile;
+        if (boost::filesystem::exists(pathPKFile)) context.use_private_key_file(pathPKFile.string(), boost::asio::ssl::context::pem);
         else printf("ThreadRPCServer ERROR: missing server private key file %s\n", pathPKFile.string().c_str());
 
         string strCiphers = GetArg("-rpcsslciphers", "TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH");
@@ -838,10 +836,10 @@ void ThreadRPCServer2(void* parg)
 
     // Try a dual IPv6/IPv4 socket, falling back to separate IPv4 and IPv6 sockets
     const bool loopback = !mapArgs.count("-rpcallowip");
-    asio::ip::address bindAddress = loopback ? asio::ip::address_v6::loopback() : asio::ip::address_v6::any();
-    ip::tcp::endpoint endpoint(bindAddress, GetArg("-rpcport", GetDefaultRPCPort()));
+    boost::asio::ip::address bindAddress = loopback ? boost::asio::ip::address_v6::loopback() : boost::asio::ip::address_v6::any();
+    boost::asio::ip::tcp::endpoint endpoint(bindAddress, GetArg("-rpcport", GetDefaultRPCPort()));
     boost::system::error_code v6_only_error;
-    boost::shared_ptr<ip::tcp::acceptor> acceptor(new ip::tcp::acceptor(io_service));
+    boost::shared_ptr<boost::asio::ip::tcp::acceptor> acceptor(new boost::asio::ip::tcp::acceptor(io_service));
 
     boost::signals2::signal<void ()> StopRequests;
 
@@ -856,12 +854,12 @@ void ThreadRPCServer2(void* parg)
         acceptor->set_option(boost::asio::ip::v6_only(loopback), v6_only_error);
 
         acceptor->bind(endpoint);
-        acceptor->listen(socket_base::max_connections);
+        acceptor->listen(boost::asio::socket_base::max_connections);
 
         RPCListen(acceptor, context, fUseSSL);
         // Cancel outstanding listen-requests for this acceptor when shutting down
-        StopRequests.connect(signals2::slot<void ()>(
-                    static_cast<void (ip::tcp::acceptor::*)()>(&ip::tcp::acceptor::close), acceptor.get())
+        StopRequests.connect(boost::signals2::slot<void ()>(
+                    static_cast<void (boost::asio::ip::tcp::acceptor::*)()>(&boost::asio::ip::tcp::acceptor::close), acceptor.get())
                 .track(acceptor));
 
         fListening = true;
@@ -875,19 +873,19 @@ void ThreadRPCServer2(void* parg)
         // If dual IPv6/IPv4 failed (or we're opening loopback interfaces only), open IPv4 separately
         if (!fListening || loopback || v6_only_error)
         {
-            bindAddress = loopback ? asio::ip::address_v4::loopback() : asio::ip::address_v4::any();
+            bindAddress = loopback ? boost::asio::ip::address_v4::loopback() : boost::asio::ip::address_v4::any();
             endpoint.address(bindAddress);
 
-            acceptor.reset(new ip::tcp::acceptor(io_service));
+            acceptor.reset(new boost::asio::ip::tcp::acceptor(io_service));
             acceptor->open(endpoint.protocol());
             acceptor->set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
             acceptor->bind(endpoint);
-            acceptor->listen(socket_base::max_connections);
+            acceptor->listen(boost::asio::socket_base::max_connections);
 
             RPCListen(acceptor, context, fUseSSL);
             // Cancel outstanding listen-requests for this acceptor when shutting down
-            StopRequests.connect(signals2::slot<void ()>(
-                        static_cast<void (ip::tcp::acceptor::*)()>(&ip::tcp::acceptor::close), acceptor.get())
+            StopRequests.connect(boost::signals2::slot<void ()>(
+                        static_cast<void (boost::asio::ip::tcp::acceptor::*)()>(&boost::asio::ip::tcp::acceptor::close), acceptor.get())
                     .track(acceptor));
 
             fListening = true;
@@ -1126,16 +1124,16 @@ Object CallRPC(const string& strMethod, const Array& params)
 
     // Connect to localhost
     bool fUseSSL = GetBoolArg("-rpcssl");
-    asio::io_service io_service;
+    boost::asio::io_service io_service;
 #if BOOST_VERSION >= 106600
-    ssl::context context(ssl::context::sslv23);
+    boost::asio::ssl::context context(boost::asio::ssl::context::sslv23);
 #else
-    ssl::context context(io_service, ssl::context::sslv23);
+    boost::asio::ssl::context context(io_service, boost::asio::ssl::context::sslv23);
 #endif
-    context.set_options(ssl::context::no_sslv2);
-    asio::ssl::stream<asio::ip::tcp::socket> sslStream(io_service, context);
-    SSLIOStreamDevice<asio::ip::tcp> d(sslStream, fUseSSL);
-    iostreams::stream< SSLIOStreamDevice<asio::ip::tcp> > stream(d);
+    context.set_options(boost::asio::ssl::context::no_sslv2);
+    boost::asio::ssl::stream<boost::asio::ip::tcp::socket> sslStream(io_service, context);
+    SSLIOStreamDevice<boost::asio::ip::tcp> d(sslStream, fUseSSL);
+    boost::iostreams::stream< SSLIOStreamDevice<boost::asio::ip::tcp> > stream(d);
     if (!d.connect(GetArg("-rpcconnect", "127.0.0.1"), GetArg("-rpcport", itostr(GetDefaultRPCPort()))))
         throw runtime_error("couldn't connect to server");
 

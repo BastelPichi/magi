@@ -6,7 +6,6 @@
 #include <boost/tuple/tuple.hpp>
 
 using namespace std;
-using namespace boost;
 
 #include "script.h"
 #include "keystore.h"
