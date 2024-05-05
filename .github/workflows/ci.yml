@@ -33,6 +33,17 @@ jobs:
           make
           make install
 
+      - name: Install Boost
+        run: |
+          git clone https://github.com/libmingw-w64/libboost-mingw-w64.git
+          cd libboost-mingw-w64
+          git submodule update --init --recursive
+          chmod +x build.debian.sh
+          ./build.debian.sh
+          ls
+          sudo cp -R ./libboost-mingw-w64/lib/* /usr/x86_64-w64-mingw32/lib
+          sudo cp -R ./libboost-mingw-w64/include/boost /usr/x86_64-w64-mingw32/include
+
       - name: Compile Magi
         run: |
           cd $HOME/work/magi/magi/magi/src
