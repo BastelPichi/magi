@@ -18,7 +18,7 @@ jobs:
           wget https://github.com/BastelPichi/berkely-db-fixed/releases/download/fix/db-4.8.30.NC.tar.gz
           tar xf db-4.8.30.NC.tar.gz
           cd db-4.8.30.NC/build_unix
-          ../dist/configure -q --disable-shared --enable-cxx --disable-replication --with-pic --host=g++-arm-linux-gnueabihf
+          ../dist/configure -q --disable-shared --enable-cxx --disable-replication --with-pic --host=arm-linux-gnueabihf CXX=g++-arm-linux-gnueabihf
           make
           sudo make install
 
