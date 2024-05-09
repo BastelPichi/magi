@@ -26,7 +26,8 @@ jobs:
       - name: Compile Magi
         run: |
           pwd
-          cd $HOME/work/magi/magi/magi/src
+          ls
+          cd $HOME/work/magi/magi/src
           ls
           make -f makefile.unix STATIC=1 CXXFLAGS='-I $HOME/berkely/include -L $HOME/berkely/lib'
           ls
