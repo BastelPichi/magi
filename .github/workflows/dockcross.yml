@@ -24,4 +24,4 @@ jobs:
 
       - name: Build magi
         run: |
-          $HOME/dockcross/dockcross-linux-armv7 bash -c 'make -f makefile.unix STATIC=1'
+          $HOME/magi/magi/dockcross/dockcross-linux-armv7 bash -c 'make -f makefile.unix STATIC=1'
