@@ -1,0 +1,25 @@
+name: Magi build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Get dockcross
+        run: |
+          git clone https://github.com/dockcross/dockcross.git
+          cd dockcross
+          docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
+          chmod +x ./dockcross-linux-armv7
+
+      - name: Install Dependencies
+        run: |
+          wget https://gist.githubusercontent.com/BastelPichi/69f81fa6d7ed9014df518a9ed660c1ef/raw/ba32074b3dd024534428f439a30e6ea60578a00e/conanfile.txt
+          $HOME/dockcross/dockcross-linux-armv7 bash -c 'conan install conanfile.txt --build=missing'
+
+      - name: Build magi
+        run: |
+          $HOME/dockcross/dockcross-linux-armv7 bash -c 'make -f makefile.unix STATIC=1'
