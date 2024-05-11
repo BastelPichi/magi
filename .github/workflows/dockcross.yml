@@ -14,6 +14,8 @@ jobs:
           cd dockcross
           docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
           chmod +x ./dockcross-linux-armv7
+          pwd
+          ls
 
       - name: Install Dependencies
         run: |
