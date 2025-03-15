@@ -1,0 +1,42 @@
+name: Magi Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install debootstrap
+        run: |
+          sudo apt update
+          sudo apt install debootstrap
+
+      - name: Build Magi
+        run: |
+          debootstrap --no-check-gpg --no-check-certificate jessie jessie http://archive.debian.org/debian/
+          sudo chroot jessie/
+
+          cd root
+          apt update
+          yes | apt install cmake curl make patch git
+          yes | apt install bison g++ pkgconf python3 xz-utils
+          yes | apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
+          yes | apt install mingw-w64
+          echo 1 |  update-alternatives --config x86_64-w64-mingw32-g++
+          git clone --branch v1.4.8.1 https://github.com/jondow72/magi.git
+          cd magi/depends
+          make HOST=x86_64-w64-mingw32 -j4
+          
+          cp -R /root/magi/depends/tmp/* /root/magi/depends/work/build/x86_64-w64-mingw32/qt
+          cd ..
+          /root/magi/depends/work/build/x86_64-w64-mingw32/qt/*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
+          make -j4
+          exit
+
+          sudo cp jessie/root/magi/release/m-wallet.exe .
+
+
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: m-wallet.exe
