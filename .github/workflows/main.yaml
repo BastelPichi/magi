@@ -12,7 +12,7 @@ jobs:
 
       - name: Build Magi
         run: |
-          debootstrap --no-check-gpg --no-check-certificate jessie jessie http://archive.debian.org/debian/
+          sudo debootstrap --no-check-gpg --no-check-certificate jessie jessie http://archive.debian.org/debian/
           sudo chroot jessie/
 
           cd root
