@@ -22,21 +22,21 @@ jobs:
           yes | apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
           yes | apt install mingw-w64
           echo 1 |  update-alternatives --config x86_64-w64-mingw32-g++
-          git clone --branch v1.4.8.1 https://github.com/jondow72/magi.git
+          git clone --branch depends-v23.2 https://github.com/jondow72/magi.git
           cd magi/depends
           make HOST=x86_64-w64-mingw32 -j4
           
-          cp -R /root/magi/depends/tmp/* /root/magi/depends/work/build/x86_64-w64-mingw32/qt
+          cp -R ~/magi/depends/tmp/* ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin
           cd ..
-          /root/magi/depends/work/build/x86_64-w64-mingw32/qt/*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
+          ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-3860e158698/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
           make -j4
-          exit
-
-          sudo cp jessie/root/magi/release/m-wallet.exe .
+          cd src
+          make -f makefile.mingw
+          strip magid.exe
 
 
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
-          name: m-wallet.exe
+          name: magid.exe
