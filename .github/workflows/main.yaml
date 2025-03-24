@@ -12,12 +12,12 @@ jobs:
 
       - name: Build Magi
         run: |
-          apt update
+          sudo apt update
           yes | sudo apt install cmake curl make patch git
           yes | sudo apt install bison g++ pkgconf python3 xz-utils
           yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
           yes | sudo apt install mingw-w64
-          echo 1 |  sudo update-alternatives --config x86_64-w64-mingw32-g++
+          echo 1 |  update-alternatives --config x86_64-w64-mingw32-g++
           git clone --branch depends-v23.2 https://github.com/jondow72/magi.git
           cd magi/depends
           make HOST=x86_64-w64-mingw32 -j4
