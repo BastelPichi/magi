@@ -12,10 +12,6 @@ jobs:
 
       - name: Build Magi
         run: |
-          sudo debootstrap --no-check-gpg --no-check-certificate jessie jessie http://archive.debian.org/debian/
-          sudo chroot jessie/
-
-          cd root
           apt update
           yes | apt install cmake curl make patch git
           yes | apt install bison g++ pkgconf python3 xz-utils
