@@ -20,6 +20,8 @@ jobs:
 
           cp -R ~/magi/depends/tmp/* ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin
           cd ..
+          ls /home/runner/magi/depends/work/build/x86_64-w64-mingw32/qtwin/
+          pwd
           ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-3860e158698/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
           make -j4
           cd src
