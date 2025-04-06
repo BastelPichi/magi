@@ -5,11 +5,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Install debootstrap
-        run: |
-          sudo apt update
-          sudo apt install debootstrap
-
       - name: Build Magi
         run: |
           sudo apt update
@@ -18,20 +13,10 @@ jobs:
           yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
           yes | sudo apt install mingw-w64
           echo 1 |  sudo update-alternatives --config x86_64-w64-mingw32-g++
-          pwd
-          ls
-          
+          cd ~
           git clone --branch depends-v23.2 https://github.com/jondow72/magi.git
           cd magi/depends
-          ls
-          pwd
-
-          cd ~
-          pwd
-          ls magi
           make HOST=x86_64-w64-mingw32 -j4
-          pwd
-          
 
           cp -R ~/magi/depends/tmp/* ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin
           cd ..
@@ -39,6 +24,7 @@ jobs:
           make -j4
           cd src
           make -f makefile.mingw
+          ls
           strip magid.exe
 
 
