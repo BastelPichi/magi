@@ -18,10 +18,21 @@ jobs:
           yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
           yes | sudo apt install mingw-w64
           echo 1 |  sudo update-alternatives --config x86_64-w64-mingw32-g++
+          pwd
+          ls
+          
           git clone --branch depends-v23.2 https://github.com/jondow72/magi.git
           cd magi/depends
+          ls
+          pwd
+
+          cd ~
+          pwd
+          ls magi
           make HOST=x86_64-w64-mingw32 -j4
+          pwd
           
+
           cp -R ~/magi/depends/tmp/* ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin
           cd ..
           ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-3860e158698/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
