@@ -22,7 +22,7 @@ jobs:
           cd ..
           ls /home/runner/magi/depends/work/build/x86_64-w64-mingw32/qtwin/
           pwd
-          ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-b3c88a11a82/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
+          ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
           make -j4
           cd src
           make -f makefile.mingw
