@@ -14,7 +14,7 @@ jobs:
           yes | sudo apt install mingw-w64
           echo 1 |  sudo update-alternatives --config x86_64-w64-mingw32-g++
           cd ~
-          git clone --branch depends-v23.2 https://github.com/jondow72/magi.git
+          git clone --branch depends-magi https://github.com/jondow72/magi.git
           cd magi/depends
           make HOST=x86_64-w64-mingw32 -j4
 
@@ -22,7 +22,7 @@ jobs:
           cd ..
           ls /home/runner/magi/depends/work/build/x86_64-w64-mingw32/qtwin/
           pwd
-          ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
+          ~/magi/depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-b3c88a11a82/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
           make -j4
           cd src
           make -f makefile.mingw
@@ -34,4 +34,4 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
-          name: magid.exe
+          name: magi/src/magid.exe
