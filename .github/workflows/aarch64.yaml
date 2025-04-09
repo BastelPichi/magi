@@ -24,8 +24,8 @@ jobs:
 
       - name: Compile magi & m-wallet
         run: |
-          cp -R ./depends/tmp/* ./depends/work/build/aarch64-linux-gnu/qtwin
-          ./depends/work/build/aarch64-linux-gnu/qtwin/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0
+          cp -R ./depends/tmp/* ./depends/work/build/aarch64-linux-gnu/qt
+          ./depends/work/build/aarch64-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0
           make -j4
           strip m-wallet
           cd src
