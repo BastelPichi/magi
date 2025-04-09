@@ -12,8 +12,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
 }
 
-equals($$find(QMAKE_CXX, aarch64), "aarch64-linux-gnu-g++") {
+CMPTYPE = $$find(QMAKE_CXX, aarch64)
+equals(, "aarch64-linux-gnu-g++") {
     QMAKE_SPEC=aarch64
+} else {
+    message(no match $$CMPTYPE)
 }
 # for boost > 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
