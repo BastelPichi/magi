@@ -12,6 +12,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
 }
 
+equals($$find(QMAKE_CXX, aarch64), "aarch64-linux-gnu-g++") {
+    QMAKE_SPEC=aarch64
+}
 # for boost > 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
@@ -21,20 +24,19 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 # Dependency library locations can be customized using following settings 
 # winbuild dependencies
 win32 {
-    BOOST_LIB_SUFFIX=-mt-s-x64
-    BOOST_THREAD_LIB_SUFFIX=-mt-s-x64
-    BOOST_INCLUDE_PATH=depends/x86_64-w64-mingw32/include/boost
-    BOOST_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    BDB_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    BDB_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    OPENSSL_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    OPENSSL_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    MINIUPNPC_INCLUDE_PATH=depends/x86_64-w64-mingw32/include/miniupnpc
-    MINIUPNPC_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    QRENCODE_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    QRENCODE_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    GMP_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    GMP_LIB_PATH=depends/x86_64-w64-mingw32/lib
+#    BOOST_LIB_SUFFIX=-mgw49-mt-s-1_58
+    BOOST_INCLUDE_PATH=$$DEPSDIR/boost_1_58_0
+    BOOST_LIB_PATH=$$DEPSDIR/boost_1_58_0/stage/lib
+    BDB_INCLUDE_PATH=$$DEPSDIR/db-4.8.30.NC/build_unix
+    BDB_LIB_PATH=$$DEPSDIR/db-4.8.30.NC/build_unix
+    OPENSSL_INCLUDE_PATH=$$DEPSDIR/openssl-1.0.2j/include
+    OPENSSL_LIB_PATH=$$DEPSDIR/openssl-1.0.2j
+    MINIUPNPC_INCLUDE_PATH=$$DEPSDIR/miniupnpc
+    MINIUPNPC_LIB_PATH=$$DEPSDIR/miniupnpc
+    QRENCODE_INCLUDE_PATH=$$DEPSDIR/qrencode-3.4.3
+    QRENCODE_LIB_PATH=$$DEPSDIR/qrencode-3.4.3/.libs
+    GMP_INCLUDE_PATH=$$DEPSDIR/gmp-6.0.0
+    GMP_LIB_PATH=$$DEPSDIR/gmp-6.0.0/.libs
 }
 
 OBJECTS_DIR = build
@@ -83,7 +85,7 @@ contains(USE_UPNP, -) {
     count(USE_UPNP, 0) {
         USE_UPNP=1
     }
-    DEFINES += USE_UPNP=$$USE_UPNP MINIUPNP_STATICLIB
+    DEFINES += USE_UPNP=$$USE_UPNP STATICLIB
     INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
     LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
     win32:LIBS += -liphlpapi
@@ -157,7 +159,7 @@ QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) cl
 }
 
 # If we have an ARM device, we can't use SSE2 instructions, so don't try to use them
-QMAKE_XCPUARCH = $$QMAKE_HOST.arch
+QMAKE_XCPUARCH = $$QMAKE_SPEC
 equals(QMAKE_XCPUARCH, armv7l) {
     message(Building without SSE2 support)
 }
@@ -166,6 +168,23 @@ else:equals(QMAKE_XCPUARCH, armv6l) {
 }
 else:equals(QMAKE_XCPUARCH, aarch64) {
     message(Building without SSE2 support)
+
+    BDB_LIB_SUFFIX=-4.8
+    BOOST_LIB_SUFFIX=-mt-a64
+    BOOST_THREAD_LIB_SUFFIX=-mt-a64
+    BOOST_INCLUDE_PATH=depends/aarch64-linux-gnu/include/boost
+    BOOST_LIB_PATH=depends/aarch64-linux-gnu/lib
+    BDB_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    BDB_LIB_PATH=depends/aarch64-linux-gnu/lib
+    OPENSSL_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    OPENSSL_LIB_PATH=depends/aarch64-linux-gnu/lib
+    MINIUPNPC_INCLUDE_PATH=depends/aarch64-linux-gnu/include/miniupnpc
+    MINIUPNPC_LIB_PATH=depends/aarch64-linux-gnu/lib
+    QRENCODE_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    QRENCODE_LIB_PATH=depends/aarch64-linux-gnu/lib
+    GMP_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    GMP_LIB_PATH=depends/aarch64-linux-gnu/lib
+
 }
 else {
     message(Building with SSE2 support)
@@ -376,7 +395,7 @@ CODECFORTR = UTF-8
 TRANSLATIONS = $$files(src/qt/locale/bitcoin_*.ts)
 
 isEmpty(QMAKE_LRELEASE) {
-    win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+    win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 isEmpty(QM_DIR):QM_DIR = $$PWD/src/qt/locale
@@ -400,8 +419,8 @@ OTHER_FILES += README.md \
 
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
-    macx:BOOST_LIB_SUFFIX = -mt-s-x64
-    windows:BOOST_LIB_SUFFIX = -mt-s-x64
+    macx:BOOST_LIB_SUFFIX = -mt-s
+    windows:BOOST_LIB_SUFFIX = -mgw49-mt-s-1_58
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {

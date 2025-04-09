@@ -1,4 +1,4 @@
-name: Magi build
+name: Magi build (Linux)
 on: [push]
 
 jobs:
@@ -12,19 +12,24 @@ jobs:
         run: |
           sudo apt update
           sudo apt install wget curl build-essential libssl-dev libgmp-dev libminiupnpc-dev libboost-all-dev libprotobuf-dev libqrencode-dev qtbase5-dev qt5-qmake qttools5-dev-tools -y
+
       - name: Install BerkelyDB
         run: |
-          wget https://github.com/BastelPichi/berkely-db-fixed/releases/download/fix/db-4.8.30.NC.tar.gz
+          wget -q 'https://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz'
           tar xf db-4.8.30.NC.tar.gz
-          cd db-4.8.30.NC/build_unix
+          sed -i 's/__atomic_compare_exchange/__atomic_compare_exchange_db/g' db-4.8.30.NC/dbinc/atomic.h
+          cd db-4.8.30.NC/dist
+          sudo curl -s -o config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
+          sudo curl -s -o config.sub 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'
+          cd ../build_unix
           ../dist/configure -q --disable-shared --enable-cxx --disable-replication --with-pic
           make
           sudo make install
-          
+
       - name: Compile M-Wallet
         run: |
           cd $HOME/work/magi/magi/
-          qmake "USE_UPNP=1" "USE_DBUS=1" BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib
+          qmake "USE_UPNP=0" "USE_DBUS=1" BDB_INCLUDE_PATH=/usr/local/BerkeleyDB.4.8/include BDB_LIB_PATH=/usr/local/BerkeleyDB.4.8/lib
           make
 
       - name: Compile Magi
@@ -35,7 +40,6 @@ jobs:
           make -f makefile.unix STATIC=1
           strip magid
 
-          
       - name: Upload
         uses: actions/upload-artifact@v4.3.3
         with:
