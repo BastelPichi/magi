@@ -197,8 +197,8 @@ else {
     QMAKE_CFLAGS += -msse2
 
     BDB_LIB_SUFFIX=-4.8
-    BOOST_LIB_SUFFIX=-mt-a64
-    BOOST_THREAD_LIB_SUFFIX=-mt-a64
+    BOOST_LIB_SUFFIX=-mt-x64
+    BOOST_THREAD_LIB_SUFFIX=-mt-x64
     BOOST_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/boost
     BOOST_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
     BDB_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
