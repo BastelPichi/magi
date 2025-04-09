@@ -195,6 +195,22 @@ else {
     message(Building with SSE2 support)
     QMAKE_CXXFLAGS += -msse2
     QMAKE_CFLAGS += -msse2
+
+    BDB_LIB_SUFFIX=-4.8
+    BOOST_LIB_SUFFIX=-mt-a64
+    BOOST_THREAD_LIB_SUFFIX=-mt-a64
+    BOOST_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/boost
+    BOOST_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    BDB_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    BDB_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    OPENSSL_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    OPENSSL_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    MINIUPNPC_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/miniupnpc
+    MINIUPNPC_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    QRENCODE_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    QRENCODE_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    GMP_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    GMP_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
 }
 #endif
 
