@@ -21,16 +21,16 @@ jobs:
         run: |
           git clone https://github.com/magi-dev/depends
           cd depends
-          make HOST=x86_64-w64-mingw32 -j4
+          make HOST=x86_64-w64-mingw32 -j 4
 
       - name: Compile magi & m-wallet
         run: |
           cp -R ./depends/tmp/* ./depends/work/build/x86_64-w64-mingw32/qtwin
-          ./depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
+          ./depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0
           make -j4
           strip release/m-wallet.exe
           cd src
-          make -f makefile.mingw
+          make -f makefile.mingw -j 4
           strip magid.exe
 
       - name: Upload artifact
