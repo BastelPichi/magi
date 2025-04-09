@@ -1,0 +1,41 @@
+name: Magi Build (Windows)
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          yes | sudo apt install cmake curl make patch git
+          yes | sudo apt install bison g++ pkgconf python3 xz-utils
+          yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
+          yes | sudo apt install mingw-w64
+          echo 1 |  sudo update-alternatives --config x86_64-w64-mingw32-g++
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Clone & Compile depends
+        run: |
+          git clone https://github.com/magi-dev/depends
+          cd depends
+          make HOST=x86_64-w64-mingw32 -j4
+
+      - name: Compile magi & m-wallet
+        run: |
+          cp -R ./depends/tmp/* ./depends/work/build/x86_64-w64-mingw32/qtwin
+          ./depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=1
+          make -j4
+          strip release/m-wallet.exe
+          cd src
+          make -f makefile.mingw
+          strip magid.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          path: |
+            src/magid.exe
+            release/m-wallet.exe

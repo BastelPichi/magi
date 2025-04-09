@@ -1,0 +1,40 @@
+name: Magi Build (Aarch64)
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          yes | sudo apt install cmake curl make patch git
+          yes | sudo apt install bison g++ pkgconf python3 xz-utils
+          yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
+          yes | sudo apt install g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Clone & Compile depends
+        run: |
+          git clone https://github.com/magi-dev/depends
+          cd depends
+          make HOST=aarch64-linux-gnu -j4
+
+      - name: Compile magi & m-wallet
+        run: |
+          cp -R ./depends/tmp/* ./depends/work/build/aarch64-linux-gnu/qtwin
+          ./depends/work/build/aarch64-linux-gnu/qtwin/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0
+          make -j4
+          strip m-wallet
+          cd src
+          make -f makefile.aarch64
+          strip magid
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          path: |
+            src/magid
+            m-wallet
