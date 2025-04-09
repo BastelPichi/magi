@@ -24,6 +24,58 @@ equals(CMPTYPE, "aarch64-linux-gnu-g++") {
 # use: BOOST_THREAD_LIB_SUFFIX=_win32-...
 # when linking against a specific BerkelyDB version: BDB_LIB_SUFFIX=-4.8
 
+# If we have an ARM device, we can't use SSE2 instructions, so don't try to use them
+QMAKE_XCPUARCH = $$QMAKE_SPEC
+equals(QMAKE_XCPUARCH, armv7l) {
+    message(Building without SSE2 support)
+}
+else:equals(QMAKE_XCPUARCH, armv6l) {
+    message(Building without SSE2 support)
+}
+else:equals(QMAKE_XCPUARCH, aarch64) {
+    message(Building without SSE2 support)
+
+    BDB_LIB_SUFFIX=-4.8
+    BOOST_LIB_SUFFIX=-mt-a64
+    BOOST_THREAD_LIB_SUFFIX=-mt-a64
+    BOOST_INCLUDE_PATH=depends/aarch64-linux-gnu/include/boost
+    BOOST_LIB_PATH=depends/aarch64-linux-gnu/lib
+    BDB_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    BDB_LIB_PATH=depends/aarch64-linux-gnu/lib
+    OPENSSL_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    OPENSSL_LIB_PATH=depends/aarch64-linux-gnu/lib
+    MINIUPNPC_INCLUDE_PATH=depends/aarch64-linux-gnu/include/miniupnpc
+    MINIUPNPC_LIB_PATH=depends/aarch64-linux-gnu/lib
+    QRENCODE_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    QRENCODE_LIB_PATH=depends/aarch64-linux-gnu/lib
+    GMP_INCLUDE_PATH=depends/aarch64-linux-gnu/include
+    GMP_LIB_PATH=depends/aarch64-linux-gnu/lib
+
+}
+else {
+    message(Building with SSE2 support)
+    QMAKE_CXXFLAGS += -msse2
+    QMAKE_CFLAGS += -msse2
+
+    BDB_LIB_SUFFIX=-4.8
+    BOOST_LIB_SUFFIX=-mt-x64
+    BOOST_THREAD_LIB_SUFFIX=-mt-x64
+    BOOST_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/boost
+    BOOST_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    BDB_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    BDB_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    OPENSSL_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    OPENSSL_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    MINIUPNPC_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/miniupnpc
+    MINIUPNPC_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    QRENCODE_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    QRENCODE_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+    GMP_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
+    GMP_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
+}
+#endif
+
+
 # Dependency library locations can be customized using following settings 
 # winbuild dependencies
 win32 {
@@ -162,57 +214,6 @@ QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) cl
     QMAKE_EXTRA_TARGETS += genbuild
     DEFINES += HAVE_BUILD_INFO
 }
-
-# If we have an ARM device, we can't use SSE2 instructions, so don't try to use them
-QMAKE_XCPUARCH = $$QMAKE_SPEC
-equals(QMAKE_XCPUARCH, armv7l) {
-    message(Building without SSE2 support)
-}
-else:equals(QMAKE_XCPUARCH, armv6l) {
-    message(Building without SSE2 support)
-}
-else:equals(QMAKE_XCPUARCH, aarch64) {
-    message(Building without SSE2 support)
-
-    BDB_LIB_SUFFIX=-4.8
-    BOOST_LIB_SUFFIX=-mt-a64
-    BOOST_THREAD_LIB_SUFFIX=-mt-a64
-    BOOST_INCLUDE_PATH=depends/aarch64-linux-gnu/include/boost
-    BOOST_LIB_PATH=depends/aarch64-linux-gnu/lib
-    BDB_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    BDB_LIB_PATH=depends/aarch64-linux-gnu/lib
-    OPENSSL_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    OPENSSL_LIB_PATH=depends/aarch64-linux-gnu/lib
-    MINIUPNPC_INCLUDE_PATH=depends/aarch64-linux-gnu/include/miniupnpc
-    MINIUPNPC_LIB_PATH=depends/aarch64-linux-gnu/lib
-    QRENCODE_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    QRENCODE_LIB_PATH=depends/aarch64-linux-gnu/lib
-    GMP_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    GMP_LIB_PATH=depends/aarch64-linux-gnu/lib
-
-}
-else {
-    message(Building with SSE2 support)
-    QMAKE_CXXFLAGS += -msse2
-    QMAKE_CFLAGS += -msse2
-
-    BDB_LIB_SUFFIX=-4.8
-    BOOST_LIB_SUFFIX=-mt-x64
-    BOOST_THREAD_LIB_SUFFIX=-mt-x64
-    BOOST_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/boost
-    BOOST_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    BDB_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    BDB_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    OPENSSL_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    OPENSSL_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    MINIUPNPC_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/miniupnpc
-    MINIUPNPC_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    QRENCODE_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    QRENCODE_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    GMP_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    GMP_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-}
-#endif
 
 QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
 
