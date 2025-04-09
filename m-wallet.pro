@@ -13,7 +13,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 CMPTYPE = $$find(QMAKE_CXX, aarch64)
-equals(, "aarch64-linux-gnu-g++") {
+equals(CMPTYPE, "aarch64-linux-gnu-g++") {
     QMAKE_SPEC=aarch64
 } else {
     message(no match $$CMPTYPE)
