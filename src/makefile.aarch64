@@ -13,8 +13,8 @@ USE_UPNP:=0
 # :=0 --> Disable IPv6 support
 USE_IPV6:=1
 
-CXX           = g++-aarch64-linux-gnu
-LINK          = g++-aarch64-linux-gnu
+CXX           = aarch64-linux-gnu-g++
+LINK          = aarch64-linux-gnu-g++
 
 DEFS=-DBOOST_SPIRIT_THREADSAFE
 

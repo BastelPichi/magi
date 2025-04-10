@@ -28,7 +28,7 @@ jobs:
           make -j4
           strip m-wallet
           cd src
-          make -f makefile.aarch64 -j4
+          make -f makefile.unix -j4
           strip magid
 
       - name: Upload artifact
