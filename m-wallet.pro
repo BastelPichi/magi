@@ -15,8 +15,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 CMPTYPE = $$find(QMAKE_CXX, aarch64)
 equals(CMPTYPE, "aarch64-linux-gnu-g++") {
     QMAKE_SPEC=aarch64
-} else {
-    message(no match $$CMPTYPE)
+# this is not nice, but for now "it-works"
 }
 # for boost > 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
@@ -24,76 +23,23 @@ equals(CMPTYPE, "aarch64-linux-gnu-g++") {
 # use: BOOST_THREAD_LIB_SUFFIX=_win32-...
 # when linking against a specific BerkelyDB version: BDB_LIB_SUFFIX=-4.8
 
-# If we have an ARM device, we can't use SSE2 instructions, so don't try to use them
-QMAKE_XCPUARCH = $$QMAKE_SPEC
-equals(QMAKE_XCPUARCH, armv7l) {
-    message(Building without SSE2 support)
-}
-else:equals(QMAKE_XCPUARCH, armv6l) {
-    message(Building without SSE2 support)
-}
-else:equals(QMAKE_XCPUARCH, aarch64) {
-    message(Building without SSE2 support)
-
-    BDB_LIB_SUFFIX=-4.8
-    BOOST_LIB_SUFFIX=-mt-a64
-    BOOST_THREAD_LIB_SUFFIX=-mt-a64
-    BOOST_INCLUDE_PATH=depends/aarch64-linux-gnu/include/boost
-    BOOST_LIB_PATH=depends/aarch64-linux-gnu/lib
-    BDB_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    BDB_LIB_PATH=depends/aarch64-linux-gnu/lib
-    OPENSSL_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    OPENSSL_LIB_PATH=depends/aarch64-linux-gnu/lib
-    MINIUPNPC_INCLUDE_PATH=depends/aarch64-linux-gnu/include/miniupnpc
-    MINIUPNPC_LIB_PATH=depends/aarch64-linux-gnu/lib
-    QRENCODE_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    QRENCODE_LIB_PATH=depends/aarch64-linux-gnu/lib
-    GMP_INCLUDE_PATH=depends/aarch64-linux-gnu/include
-    GMP_LIB_PATH=depends/aarch64-linux-gnu/lib
-
-}
-else {
-    message(Building with SSE2 support)
-    QMAKE_CXXFLAGS += -msse2
-    QMAKE_CFLAGS += -msse2
-
-    BDB_LIB_SUFFIX=-4.8
-    BOOST_LIB_SUFFIX=-mt-x64
-    BOOST_THREAD_LIB_SUFFIX=-mt-x64
-    BOOST_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/boost
-    BOOST_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    BDB_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    BDB_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    OPENSSL_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    OPENSSL_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    MINIUPNPC_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include/miniupnpc
-    MINIUPNPC_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    QRENCODE_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    QRENCODE_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-    GMP_INCLUDE_PATH=depends/x86_64-pc-linux-gnu/include
-    GMP_LIB_PATH=depends/x86_64-pc-linux-gnu/lib
-}
-#endif
-
-
 # Dependency library locations can be customized using following settings 
 # winbuild dependencies
-win32 {
-#    BOOST_LIB_SUFFIX=-mgw49-mt-s-1_58
+!isEmpty($$DEPSDIR) {
     BOOST_LIB_SUFFIX=-mt-s-x64
     BOOST_THREAD_LIB_SUFFIX=-mt-s-x64
-    BOOST_INCLUDE_PATH=depends/x86_64-w64-mingw32/include/boost
-    BOOST_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    BDB_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    BDB_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    OPENSSL_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    OPENSSL_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    MINIUPNPC_INCLUDE_PATH=depends/x86_64-w64-mingw32/include/miniupnpc
-    MINIUPNPC_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    QRENCODE_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    QRENCODE_LIB_PATH=depends/x86_64-w64-mingw32/lib
-    GMP_INCLUDE_PATH=depends/x86_64-w64-mingw32/include
-    GMP_LIB_PATH=depends/x86_64-w64-mingw32/lib
+    BOOST_INCLUDE_PATH=$$DEPSDIR/include/boost
+    BOOST_LIB_PATH=$$DEPSDIR/lib
+    BDB_INCLUDE_PATH=$$DEPSDIR/include
+    BDB_LIB_PATH=$$DEPSDIR/lib
+    OPENSSL_INCLUDE_PATH=$$DEPSDIR/include
+    OPENSSL_LIB_PATH=$$DEPSDIR/lib
+    MINIUPNPC_INCLUDE_PATH=$$DEPSDIR/include/miniupnpc
+    MINIUPNPC_LIB_PATH=$$DEPSDIR/lib
+    QRENCODE_INCLUDE_PATH=$$DEPSDIR/include
+    QRENCODE_LIB_PATH=$$DEPSDIR/lib
+    GMP_INCLUDE_PATH=$$DEPSDIR/include
+    GMP_LIB_PATH=$$DEPSDIR/lib
 }
 
 OBJECTS_DIR = build
@@ -142,7 +88,7 @@ contains(USE_UPNP, -) {
     count(USE_UPNP, 0) {
         USE_UPNP=1
     }
-    DEFINES += USE_UPNP=$$USE_UPNP MINIUPNP_STATICLIB
+    DEFINES += USE_UPNP=$$USE_UPNP STATICLIB
     INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
     LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
     win32:LIBS += -liphlpapi
@@ -214,6 +160,24 @@ QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) cl
     QMAKE_EXTRA_TARGETS += genbuild
     DEFINES += HAVE_BUILD_INFO
 }
+
+# If we have an ARM device, we can't use SSE2 instructions, so don't try to use them
+QMAKE_XCPUARCH = $$QMAKE_HOST.arch
+equals(QMAKE_XCPUARCH, armv7l) {
+    message(Building without SSE2 support)
+}
+else:equals(QMAKE_XCPUARCH, armv6l) {
+    message(Building without SSE2 support)
+}
+else:equals(QMAKE_XCPUARCH, aarch64) {
+    message(Building without SSE2 support)
+}
+else {
+    message(Building with SSE2 support)
+    QMAKE_CXXFLAGS += -msse2
+    QMAKE_CFLAGS += -msse2
+}
+#endif
 
 QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
 
@@ -417,7 +381,8 @@ CODECFORTR = UTF-8
 TRANSLATIONS = $$files(src/qt/locale/bitcoin_*.ts)
 
 isEmpty(QMAKE_LRELEASE) {
-    QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+    win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
+    else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 isEmpty(QM_DIR):QM_DIR = $$PWD/src/qt/locale
 # automatically build translations, so they can be included in resource file
@@ -440,8 +405,8 @@ OTHER_FILES += README.md \
 
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
-    macx:BOOST_LIB_SUFFIX = -mt-s-x64
-    windows:BOOST_LIB_SUFFIX = -mt-s-x64
+    macx:BOOST_LIB_SUFFIX = -mt-s
+    windows:BOOST_LIB_SUFFIX = -mgw49-mt-s-1_58
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
