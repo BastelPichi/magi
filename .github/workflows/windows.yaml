@@ -26,7 +26,7 @@ jobs:
       - name: Compile magi & m-wallet
         run: |
           mv ./depends/tmp/* ./depends/work/build/x86_64-w64-mingw32/qtwin
-          ./depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends BOOST_THREAD_LIB_SUFFIX=-mt-x64
+          ./depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends/x86_64-w64-mingw32 BOOST_THREAD_LIB_SUFFIX=-mt-x64
           make -j4
           strip release/m-wallet.exe
 

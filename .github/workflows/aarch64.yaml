@@ -25,7 +25,7 @@ jobs:
       - name: Compile magi & m-wallet
         run: |
           mv ./depends/tmp/* ./depends/work/build/aarch64-linux-gnu/qt
-          ./depends/work/build/aarch64-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends BOOST_LIB_SUFFIX=-mt-a64 BOOST_THREAD_LIB_SUFFIX=-mt-a64
+          ./depends/work/build/aarch64-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends/aarch64-linux-gnu BOOST_LIB_SUFFIX=-mt-a64 BOOST_THREAD_LIB_SUFFIX=-mt-a64
           make -j4
 
       - name: Compile magid
