@@ -25,12 +25,15 @@ jobs:
 
       - name: Compile magi & m-wallet
         run: |
-          cp -R ./depends/tmp/* ./depends/work/build/x86_64-w64-mingw32/qtwin
+          mv ./depends/tmp/* ./depends/work/build/x86_64-w64-mingw32/qtwin
           ./depends/work/build/x86_64-w64-mingw32/qtwin/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends BOOST_THREAD_LIB_SUFFIX=-mt-x64
           make -j4
           strip release/m-wallet.exe
+
+      - name: Compile magid
+        run: |
           cd src
-          make -f makefile.mingw -j 4
+          make -f makefile.mingw -j4
           strip magid.exe
 
       - name: Upload artifact
