@@ -15,15 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
 
-      - name: Clone & Compile depends
+      - name: Download Dependencies
         run: |
-          git clone https://github.com/magi-dev/depends
-          cd depends
-          make -j4
+          wget https://github.com/magi-dev/depends/raw/refs/heads/compiled/x86_64-pc-linux-gnu.zip
+          unzip x86_64-pc-linux-gnu.zip
 
       - name: Compile m-wallet
         run: |
-          mv ./depends/tmp/* ./depends/work/build/x86_64-pc-linux-gnu/qt
           ./depends/work/build/x86_64-pc-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends/x86_64-pc-linux-gnu/
           make -j4
           strip m-wallet
