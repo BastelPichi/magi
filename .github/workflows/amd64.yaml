@@ -11,23 +11,29 @@ jobs:
           yes | sudo apt install cmake curl make patch git
           yes | sudo apt install bison g++ pkgconf python3 xz-utils
           yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
+          mkdir ../depends
 
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          path: ../depends
 
       - name: Download Dependencies
         run: |
+          cd ../depends
           wget https://github.com/magi-dev/depends/raw/refs/heads/compiled/x86_64-pc-linux-gnu.zip
           unzip x86_64-pc-linux-gnu.zip
 
       - name: Compile m-wallet
         run: |
+          cd ../depends
           ./depends/work/build/x86_64-pc-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends/x86_64-pc-linux-gnu/
           make -j4
           strip m-wallet
 
       - name: Compile magid
         run: |
+          cd ../depends
           cd src
           make -f makefile.unix -j4
           strip magid
@@ -36,5 +42,5 @@ jobs:
         uses: actions/upload-artifact@v4.6.1
         with:
           path: |
-            src/magid
-            m-wallet
+            ../depends/src/magid
+            ../depends/m-wallet
