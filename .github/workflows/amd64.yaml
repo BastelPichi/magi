@@ -11,16 +11,15 @@ jobs:
           yes | sudo apt install cmake curl make patch git
           yes | sudo apt install bison g++ pkgconf python3 xz-utils
           yes | sudo apt install git build-essential wget pkg-config curl libtool autotools-dev autoconf automake
-          mkdir ../depends
 
       - name: Checkout
         uses: actions/checkout@v4.2.2
-        with:
-          path: ../depends
 
       - name: Download Dependencies
         run: |
-          cd ../depends
+          cd ..
+          mv magi/ depends/
+          cd depends
           wget https://github.com/magi-dev/depends/raw/refs/heads/compiled/x86_64-pc-linux-gnu.zip
           unzip x86_64-pc-linux-gnu.zip
 
