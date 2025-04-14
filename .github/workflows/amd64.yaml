@@ -17,7 +17,8 @@ jobs:
 
       - name: Download Dependencies
         run: |
-          cd ..
+          mkdir ../depends
+          cd ../depends
           wget https://github.com/magi-dev/depends/raw/refs/heads/compiled/x86_64-pc-linux-gnu.zip
           unzip x86_64-pc-linux-gnu.zip
 
