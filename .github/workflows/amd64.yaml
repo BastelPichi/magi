@@ -17,14 +17,17 @@ jobs:
 
       - name: Download Dependencies
         run: |
+          pwd
           cd ..
           mv magi/ depends/
           cd depends
+          pwd
           wget https://github.com/magi-dev/depends/raw/refs/heads/compiled/x86_64-pc-linux-gnu.zip
           unzip x86_64-pc-linux-gnu.zip
 
       - name: Compile m-wallet
         run: |
+          pwd
           cd ../depends
           ./depends/work/build/x86_64-pc-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=./depends/x86_64-pc-linux-gnu/
           make -j4
