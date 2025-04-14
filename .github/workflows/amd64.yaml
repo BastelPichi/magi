@@ -24,7 +24,7 @@ jobs:
 
       - name: Compile m-wallet
         run: |
-          ../depends/work/build/x86_64-pc-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=../depends/x86_64-pc-linux-gnu/
+          ../depends/depends/work/build/x86_64-pc-linux-gnu/qt/5.15.3-*/qtbase/bin/qmake m-wallet.pro USE_QRCODE=1 USE_UPNP=0 DEPSDIR=../depends/depends/x86_64-pc-linux-gnu/
           make -j4
           strip m-wallet
 
